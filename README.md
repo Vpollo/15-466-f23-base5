@@ -1,18 +1,16 @@
-# (TODO: your game's title)
+# Finding Godot v2
 
-Author: (TODO: your name)
+Author: Ziyu Li
 
-Design: (TODO: In two sentences or fewer, describe what is new and interesting about your game.)
+Design: This is my game 3 Finding Godot, but with collision (WalkMesh), so that you cannot pass through things anymore.
 
 Screen Shot:
 
-![Screen Shot](screenshot.png)
+![Screen Shot](find_godot_demo.gif)
 
 How To Play:
 
-(TODO: describe the controls and (if needed) goals/strategy.)
-
-Sources: (TODO: list a source URL for any assets you did not create yourself. Make sure you have a license for the asset.)
+Press WASD to move, use mouse to look around. It is normal to start with a dark screen, you will see sound once you start to move around.
 
 This game was built with [NEST](NEST.md).
 
