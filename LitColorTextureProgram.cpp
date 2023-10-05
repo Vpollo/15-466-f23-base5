@@ -75,6 +75,9 @@ LitColorTextureProgram::LitColorTextureProgram() {
 		"uniform vec3 LIGHT_DIRECTION;\n"
 		"uniform vec3 LIGHT_ENERGY;\n"
 		"uniform float LIGHT_CUTOFF;\n"
+		"uniform float TIME;\n"
+		"uniform float TIME_LAST;\n"
+		"uniform vec3 CAMERA_POS;"
 		"in vec3 position;\n"
 		"in vec3 normal;\n"
 		"in vec4 color;\n"
@@ -103,7 +106,14 @@ LitColorTextureProgram::LitColorTextureProgram() {
 		"		e = max(0.0, dot(n,-LIGHT_DIRECTION)) * LIGHT_ENERGY;\n"
 		"	}\n"
 		"	vec4 albedo = texture(TEX, texCoord) * color;\n"
-		"	fragColor = vec4(e*albedo.rgb, albedo.a);\n"
+		"   \n"
+		"   float dist_x = CAMERA_POS.x - position.x;\n"
+		"   float dist_y = CAMERA_POS.y - position.y;\n"
+		"   float dist = sqrt(dist_x*dist_x + dist_y*dist_y);\n"
+		"   float x = TIME - TIME_LAST;\n"
+		"   float decay = -0.5 * x + 1.0;\n"
+		"   if (decay < 0.0) decay = 0.0;\n"
+		"	fragColor = vec4(vec3(1.0, 1.0, 1.0)*(-pow((0.7*(15.0*x-dist)),2)+1)*decay, albedo.a);\n"
 		"}\n"
 	);
 	//As you can see above, adjacent strings in C/C++ are concatenated.
@@ -119,6 +129,9 @@ LitColorTextureProgram::LitColorTextureProgram() {
 	OBJECT_TO_CLIP_mat4 = glGetUniformLocation(program, "OBJECT_TO_CLIP");
 	OBJECT_TO_LIGHT_mat4x3 = glGetUniformLocation(program, "OBJECT_TO_LIGHT");
 	NORMAL_TO_LIGHT_mat3 = glGetUniformLocation(program, "NORMAL_TO_LIGHT");
+	TIME_float = glGetUniformLocation(program, "TIME");
+	TIME_LAST_float = glGetUniformLocation(program, "TIME_LAST");
+	CAMERA_POS_vec3 = glGetUniformLocation(program, "CAMERA_POS");
 
 	LIGHT_TYPE_int = glGetUniformLocation(program, "LIGHT_TYPE");
 	LIGHT_LOCATION_vec3 = glGetUniformLocation(program, "LIGHT_LOCATION");

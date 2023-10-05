@@ -12,6 +12,7 @@
 #include <glm/gtx/quaternion.hpp>
 
 #include <random>
+#include <iostream>
 
 GLuint phonebank_meshes_for_lit_color_texture_program = 0;
 Load< MeshBuffer > phonebank_meshes(LoadTagDefault, []() -> MeshBuffer const * {
@@ -137,6 +138,7 @@ bool PlayMode::handle_event(SDL_Event const &evt, glm::uvec2 const &window_size)
 }
 
 void PlayMode::update(float elapsed) {
+	time_elapsed += elapsed;
 	//player walking:
 	{
 		//combine inputs into a move:
@@ -227,6 +229,12 @@ void PlayMode::update(float elapsed) {
 	right.downs = 0;
 	up.downs = 0;
 	down.downs = 0;
+
+	//CD wave generation
+	if (!can_generate_wave) {
+		wave_cd -= elapsed;
+		if (wave_cd <= 0.0f) can_generate_wave = true;
+	}
 }
 
 void PlayMode::draw(glm::uvec2 const &drawable_size) {
@@ -239,9 +247,22 @@ void PlayMode::draw(glm::uvec2 const &drawable_size) {
 	glUniform1i(lit_color_texture_program->LIGHT_TYPE_int, 1);
 	glUniform3fv(lit_color_texture_program->LIGHT_DIRECTION_vec3, 1, glm::value_ptr(glm::vec3(0.0f, 0.0f,-1.0f)));
 	glUniform3fv(lit_color_texture_program->LIGHT_ENERGY_vec3, 1, glm::value_ptr(glm::vec3(1.0f, 1.0f, 0.95f)));
+
+	//wave generation
+	if (can_generate_wave && player.transform->position != last_frame_pos) {
+		time_last_wave = time_elapsed;
+		last_wave_camera_pos = player.transform->position;
+		can_generate_wave = false;
+		wave_cd = WAVE_COOL_DOWN;
+	}
+	glUniform1f(lit_color_texture_program->TIME_float, time_elapsed);
+	glUniform1f(lit_color_texture_program->TIME_LAST_float, time_last_wave);
+	glUniform3fv(lit_color_texture_program->CAMERA_POS_vec3, 1, glm::value_ptr(last_wave_camera_pos));
+	last_frame_pos = player.transform->position;
+
 	glUseProgram(0);
 
-	glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
+	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	glClearDepth(1.0f); //1.0 is actually the default value to clear the depth buffer to, but FYI you can change it.
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 

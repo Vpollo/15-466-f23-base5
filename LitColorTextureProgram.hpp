@@ -21,6 +21,10 @@ struct LitColorTextureProgram {
 	GLuint OBJECT_TO_CLIP_mat4 = -1U;
 	GLuint OBJECT_TO_LIGHT_mat4x3 = -1U;
 	GLuint NORMAL_TO_LIGHT_mat3 = -1U;
+	//test pass time to frag shader
+	GLuint TIME_float = -1U;
+	GLuint TIME_LAST_float = -1U;
+	GLuint CAMERA_POS_vec3 = -1U;
 
 	//lighting:
 	GLuint LIGHT_TYPE_int = -1U;

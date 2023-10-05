@@ -36,4 +36,14 @@ struct PlayMode : Mode {
 		//camera is at player's head and will be pitched by mouse up/down motion:
 		Scene::Camera *camera = nullptr;
 	} player;
+
+	//for sound wave generation
+	bool can_generate_wave = true;
+	const float WAVE_COOL_DOWN = 2.0f;
+	float wave_cd = 0.0f;
+
+	float time_elapsed = 0.0f;
+	float time_last_wave = 0.0f;
+	glm::vec3 last_wave_camera_pos = glm::vec3(999999.0f);
+	glm::vec3 last_frame_pos = glm::vec3(999999.0f);
 };
