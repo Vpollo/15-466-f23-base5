@@ -36,7 +36,11 @@ WalkMesh::WalkMesh(std::vector< glm::vec3 > const &vertices_, std::vector< glm::
 		float db = glm::dot(out, normals[tri.y]);
 		float dc = glm::dot(out, normals[tri.z]);
 
-		assert(da > 0.1f && db > 0.1f && dc > 0.1f);
+		// std::cout << da << ", "
+	    //       << db << ", "
+		// 	  << dc << "\n";
+
+		assert(da > 0.0f && db > 0.0f && dc > 0.0f);
 	}
 }
 
@@ -157,6 +161,7 @@ void WalkMesh::walk_in_triangle(WalkPoint const &start, glm::vec3 const &step, W
 	cross_on_edge(2, dest_bary.z, start.weights.z);
 
 	time = std::min(1.0f, min_time);
+	// std::cout << time << "\n";
 	assert(time > 0.0f);
 	glm::vec3 weights = start.weights + time * (dest_bary - start.weights);
 

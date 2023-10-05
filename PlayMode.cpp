@@ -14,15 +14,17 @@
 #include <random>
 #include <iostream>
 
+#include "Sound.hpp"
+
 GLuint phonebank_meshes_for_lit_color_texture_program = 0;
 Load< MeshBuffer > phonebank_meshes(LoadTagDefault, []() -> MeshBuffer const * {
-	MeshBuffer const *ret = new MeshBuffer(data_path("phone-bank.pnct"));
+	MeshBuffer const *ret = new MeshBuffer(data_path("wood.pnct"));
 	phonebank_meshes_for_lit_color_texture_program = ret->make_vao_for_program(lit_color_texture_program->program);
 	return ret;
 });
 
 Load< Scene > phonebank_scene(LoadTagDefault, []() -> Scene const * {
-	return new Scene(data_path("phone-bank.scene"), [&](Scene &scene, Scene::Transform *transform, std::string const &mesh_name){
+	return new Scene(data_path("wood.scene"), [&](Scene &scene, Scene::Transform *transform, std::string const &mesh_name){
 		Mesh const &mesh = phonebank_meshes->lookup(mesh_name);
 
 		scene.drawables.emplace_back(transform);
@@ -40,9 +42,13 @@ Load< Scene > phonebank_scene(LoadTagDefault, []() -> Scene const * {
 
 WalkMesh const *walkmesh = nullptr;
 Load< WalkMeshes > phonebank_walkmeshes(LoadTagDefault, []() -> WalkMeshes const * {
-	WalkMeshes *ret = new WalkMeshes(data_path("phone-bank.w"));
+	WalkMeshes *ret = new WalkMeshes(data_path("wood.w"));
 	walkmesh = &ret->lookup("WalkMesh");
 	return ret;
+});
+
+Load< Sound::Sample > footstep1_sample(LoadTagDefault, []() -> Sound::Sample const * {
+	return new Sound::Sample(data_path("footsteps/footstep1.wav"));
 });
 
 PlayMode::PlayMode() : scene(*phonebank_scene) {
@@ -65,8 +71,23 @@ PlayMode::PlayMode() : scene(*phonebank_scene) {
 	player.camera->transform->rotation = glm::angleAxis(glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
 
 	//start player walking at nearest walk point:
+	player.transform->position = glm::vec3(-5.0f, -5.0f, 0.0f);
 	player.at = walkmesh->nearest_walk_point(player.transform->position);
+	// std::cout << player.at.indices.x << ", "
+	//           << player.at.indices.y << ", "
+	// 		  << player.at.indices.y << "\n";
+	// std::cout << player.at.weights.x << ", "
+	//           << player.at.weights.y << ", "
+	// 		  << player.at.weights.z << "\n";
+	// std::cout << walkmesh->vertices.size() << "\n";
 
+	// int i = 0;
+	// for (auto vert : walkmesh->vertices) {
+	// 	std::cout << i << ": " << vert.x << ", "
+	//               << vert.y << ", "
+	// 		      << vert.z << "\n";
+	// 	i++;
+	// }
 }
 
 PlayMode::~PlayMode() {
@@ -254,6 +275,7 @@ void PlayMode::draw(glm::uvec2 const &drawable_size) {
 		last_wave_camera_pos = player.transform->position;
 		can_generate_wave = false;
 		wave_cd = WAVE_COOL_DOWN;
+		Sound::play(*footstep1_sample);
 	}
 	glUniform1f(lit_color_texture_program->TIME_float, time_elapsed);
 	glUniform1f(lit_color_texture_program->TIME_LAST_float, time_last_wave);
